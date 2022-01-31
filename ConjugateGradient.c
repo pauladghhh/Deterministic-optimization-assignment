@@ -9,8 +9,10 @@ int main()
     double x_new, y_new, fk;
     double d0 = -(-400*x*y + 400*x*x*x - 2 + 2*x);
     double d1 = -(200*y - 200*x*x);
-    double alpha, sigma = 0.05, rho = 0.19, epsilon = 4;
-    double bk, d0_old, d1_old;
+    double alpha, sigma = 0.05, rho = 0.001523, epsilon = 4;
+    double gradx = -(-400*x*y + 400*x*x*x - 2 + 2*x);
+    double grady = -(200*y - 200*x*x);
+    double bk, gradx_old, grady_old;
     unsigned short int stop = 0, iter = 0;
     while (stop == 0)
     {
@@ -19,7 +21,7 @@ int main()
         x_new = x + alpha*d0;
         y_new = y + alpha*d1;
         fk = ((100 * (y-x*x) * (y-x*x)) + ((1-x) * (1-x)));
-        while (((100 * (y_new-x_new*x_new) * (y_new-x_new*x_new)) + ((1-x) * (1-x))) > (fk + sigma*alpha*(d0*(-d0)+d1*(-d1))))
+        while (((100 * (y_new-x_new*x_new) * (y_new-x_new*x_new)) + ((1-x) * (1-x))) > (fk + sigma*alpha*(gradx*(-gradx)+grady*(-grady))))
         {
             alpha = alpha*rho;
             x_new = x + alpha*d0;
@@ -27,12 +29,11 @@ int main()
         }
         x = x_new;
         y = y_new;
-        d0_old = d0;
-        d1_old = d1;
-        bk = (d0 * d0 + d1 * d1)/(d0_old * d0_old + d1_old * d1_old);
-        d0 = -(-400*x*y + 400*x*x*x - 2 + 2*x) + (bk*d0_old);
-        d1 = -(200*y - 200*x*x) + (bk*d1_old);
-        if ((fabs(-400*x*y + 400*x*x*x - 2 + 2*x) < epsilon) && (fabs(200*y - 200*x*x) < epsilon))
+        gradx_old = gradx;
+        grady_old = grady;
+        gradx = -(-400*x*y + 400*x*x*x - 2 + 2*x);
+        grady = -(200*y - 200*x*x);
+        if ((fabs(gradx) < epsilon) && (fabs(grady) < epsilon))
         {
             stop = 1;
         }
@@ -40,6 +41,9 @@ int main()
         {
             stop = 1;
         }
+        bk = (gradx * gradx + grady * grady)/(gradx_old * gradx_old + grady_old * grady_old);
+        d0 = gradx + bk*d0;
+        d1 = grady + bk*d1;
     }
     printf("X value: %f \n",x);
     printf("Y value: %f \n",y);
