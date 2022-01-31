@@ -30,7 +30,7 @@ int main()
         d1 = (200*y - 200*x*x);
         if ((fabs(d0) < epsilon) && (fabs(d1) < epsilon))
         {
-            break;
+            stop = 1;
         }
         if (iter > 10000)
         {
